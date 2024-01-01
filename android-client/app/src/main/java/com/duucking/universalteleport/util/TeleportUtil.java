@@ -175,6 +175,8 @@ public class TeleportUtil {
             bos.write(tempbytes, 0, byteread);
         }
         isOnTrans = false;
+        bos.flush();
+        bos.close();
         os.write("finish\n".getBytes());
         // 释放资源
         socket.shutdownInput();
