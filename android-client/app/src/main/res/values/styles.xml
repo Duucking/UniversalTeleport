@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="transparent_activity" parent="Theme.Material3.DayNight.Dialog">
+<!--        <item name="android:windowNoTitle">true</item>-->
+        <!--是否去除标题 -->
+        <item name="windowNoTitle">false</item>
+        <!--是否去除边框-->
+        <item name="android:windowFrame">@null</item>
+        <!-- 背景透明 -->
+<!--        <item name="android:background">#00000000</item>-->
+<!--        <item name="android:windowBackground">@android:color/transparent</item>-->
+        <item name="windowActionBar">false</item>
+        <item name="android:foregroundGravity">bottom</item>
+        <item name="android:gravity"></item>
+        <item name="android:dialogCornerRadius">28dp</item>
+<!--        <item name="android:layout_marginTop">100dp</item>-->
+<!--        <item name="android:windowShowAnimation">@anim/dialog_bottom_in</item>-->
+<!--        <item name="android:windowExitAnimation">@anim/dialog_bottom_out</item>-->
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowFullscreen">true</item>
+<!--        <item name="android:windowIsTranslucent">true</item>&lt;!&ndash;半透明&ndash;&gt;-->
+<!--        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>-->
+    </style>
+</resources>

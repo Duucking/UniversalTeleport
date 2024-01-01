@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">UniversalTeleport</string>
+    <string name="notification_channel_id">UniversalTeleport</string>
+    <string name="notification_channel_desc">This notification is used to keep program alive.</string>
+    <string name="notification_title_name">UniversalTeleport is running~</string>
+    <string name="notification_title_content1">Notification content</string>
+    <string name="share_activity_label">Send to</string>
+    <string name="main_activity_key_lable">Key:</string>
+    <string name="main_activity_key_plain_text">Input your key</string>
+    <string name="share_activity_search_device_notice">Searching devices</string>
+    <string name="share_text_activity_label">Share text</string>
+    <string name="main_activity_ip_plain_text">Input you computer IP</string>
+    <string name="main_activity_save_button">Save</string>
+    <string name="main_activity_illustrate_text">1.Set a IP address(the device you want to connect)\n2.Give notification permission to this app\n3.Give save items to clipboard permission (choose \"Always allow\" ) to this app\n4.Enjoy it!</string>
+</resources>

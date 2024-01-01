@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">UniversalTeleport</string>
+    <string name="notification_channel_id">统一传送门</string>
+    <string name="notification_channel_desc">这个通知是为了不让进程被杀掉。</string>
+    <string name="notification_title_name">传送门正在运行中~</string>
+    <string name="notification_title_content1">我这一生如履薄冰，你说我能走到对岸吗</string>
+    <string name="share_activity_label">发送到</string>
+    <string name="main_activity_key_lable">密钥:</string>
+    <string name="main_activity_key_plain_text">输入你的密钥</string>
+    <string name="share_activity_search_device_notice">正在搜索设备</string>
+    <string name="share_text_activity_label">文本传送</string>
+    <string name="main_activity_ip_plain_text">输入你的电脑IP</string>
+    <string name="main_activity_save_button">保存设置</string>
+    <string name="main_activity_illustrate_text">1.填写你电脑的IP地址\n2.打开这个应用的通知权限\n3.打开这个应用的写入剪切板权限并选择始终允许\n4.打开这个应用的悬浮窗权限（MIUI12以上需要）\n5.退到后台开始使用吧！</string>
+</resources>
