@@ -2,8 +2,11 @@ import os
 import socket
 import time
 
+from util import configutil
 
-def send_tcp_message(send_data, ip_addr="192.168.100.157"):
+
+def send_tcp_message(send_data):
+    ip_addr = configutil.read_config("Option", "ipAddress");
     tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_addr = (ip_addr, 8556)
     tcp_socket.connect(server_addr)
@@ -51,7 +54,8 @@ def listen_udp_message():
     return recv_data.decode("UTF-8")
 
 
-def send_file(ip, filepath):
+def send_file(filepath):
+    ip_addr = configutil.read_config("Option", "ipAddress");
     send_tcp_message("funtion:fileTrans\n")
     filepath = filepath
     filesize = str(os.path.getsize(filepath))
@@ -60,7 +64,7 @@ def send_file(ip, filepath):
     f = open(filepath, 'rb')
     tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # 建立连接:
-    tcp_socket.connect((ip, 8558))
+    tcp_socket.connect((ip_addr, 8558))
     print("connect success")
     tcp_socket.send(filesize.encode("UTF-8"))
     tcp_socket.send("\n".encode("UTF-8"))
