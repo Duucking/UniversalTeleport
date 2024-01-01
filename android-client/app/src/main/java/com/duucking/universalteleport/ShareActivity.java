@@ -96,7 +96,7 @@ public class ShareActivity extends AppCompatActivity implements View.OnClickList
             try {
                 SharedPreferences sharedPreferences = getSharedPreferences("config", MODE_PRIVATE);
                 String address = sharedPreferences.getString("ip", "");
-                TeleportUtil.sendTCPMessage(address,8556,"funtion:fileTrans");
+                TeleportUtil.sendTCPMessage(address, 8556, "funtion:fileTrans");
                 TeleportUtil.sendFile(getBaseContext(), address, 8558, uri);
             } catch (IOException e) {
                 NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -105,6 +105,7 @@ public class ShareActivity extends AppCompatActivity implements View.OnClickList
                         .setContentText("传送失败咧~")
                         .setSmallIcon(R.drawable.ic_launcher_foreground)
                         .setAutoCancel(true);
+                notificationManager.cancel(514);
                 notificationManager.notify(514, notificationbuilder.build());
             }
         }

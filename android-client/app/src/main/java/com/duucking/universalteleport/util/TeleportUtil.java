@@ -153,7 +153,11 @@ public class TeleportUtil {
         Log.e("UniversalTeleportTest", "filesize: " + fileSize);
         Log.e("UniversalTeleportTest", "filename: " + fileName);
         os.write("received\n".getBytes());
-        String downloadPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
+        String downloadPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/UniversalTeleport";
+        File file = new File(downloadPath);
+        if (!file.exists()) {
+            file.mkdir();
+        }
         Log.e("UniversalTeleportTest", "downloadPath: " + downloadPath + "/" + fileName);
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(downloadPath + "/" + fileName));
 //        FileOutputStream fos = new FileOutputStream(downloadPath + "/" + fileName);
