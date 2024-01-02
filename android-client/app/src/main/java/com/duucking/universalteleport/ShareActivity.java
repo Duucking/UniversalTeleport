@@ -13,7 +13,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.duucking.universalteleport.service.AppService;
 import com.duucking.universalteleport.util.TeleportUtil;
 
 import java.io.IOException;
@@ -96,9 +95,14 @@ public class ShareActivity extends AppCompatActivity implements View.OnClickList
             try {
                 SharedPreferences sharedPreferences = getSharedPreferences("config", MODE_PRIVATE);
                 String address = sharedPreferences.getString("ip", "");
-                TeleportUtil.sendTCPMessage(address, 8556, "funtion:fileTrans");
-                TeleportUtil.sendFile(getBaseContext(), address, 8558, uri);
+                if (address.equals("")) {
+                    Toast.makeText(ShareActivity.this, "未设置IP，需要先设置呢", Toast.LENGTH_SHORT).show();
+                }else {
+                    TeleportUtil.sendTCPMessage(address, 8556, "funtion:fileTrans");
+                    TeleportUtil.sendFile(getBaseContext(), address, 8558, uri);
+                }
             } catch (IOException e) {
+                TeleportUtil.setTransStateFalse("send");
                 NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                 Notification.Builder notificationbuilder = new Notification.Builder(getBaseContext(), "8849")
                         .setContentTitle("文件传送")

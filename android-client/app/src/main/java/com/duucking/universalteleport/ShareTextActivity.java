@@ -30,7 +30,7 @@ public class ShareTextActivity extends Activity {
                     SharedPreferences sharedPreferences = getSharedPreferences("config", MODE_PRIVATE);
                     String address = sharedPreferences.getString("ip", "");
                     if (address.equals("")) {
-                        Toast.makeText(this, "未设置电脑IP，需要先设置呢", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "未设置IP，需要先设置呢", Toast.LENGTH_SHORT).show();
                     } else {
                         Thread thread = new Thread(new sendTCPThread(address, 8556, text));
                         thread.start();
@@ -70,7 +70,7 @@ public class ShareTextActivity extends Activity {
             try {
                 TeleportUtil.sendTCPMessage(address, port, text);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         }
     }

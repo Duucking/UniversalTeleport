@@ -7,13 +7,13 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
-import android.service.quicksettings.Tile;
 import android.util.Log;
 import android.service.quicksettings.TileService;
 
@@ -69,7 +69,7 @@ public class AppService extends Service {
         Log.d("UniversalTeleportTest", "AppService init");
         try {
             message_server_socket = new ServerSocket(8556);
-            file_server_socket = new ServerSocket(8558);
+            file_server_socket = new ServerSocket(8558, 1);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -86,7 +86,6 @@ public class AppService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-//        stopSelf();
         try {
             message_server_socket.close();
             file_server_socket.close();
@@ -95,15 +94,12 @@ public class AppService extends Service {
         }
         TileService.requestListeningState(this, new ComponentName(BuildConfig.APPLICATION_ID, QuickActionService.class.getName()));
         Log.e("UniversalTeleportTest", "AppService destroy");
-//        System.exit(0);
     }
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
-//        Log.e("UniversalTeleportTest", "AppService removed");
         stopSelf();
-//        TileService.requestListeningState(this, new ComponentName(BuildConfig.APPLICATION_ID, QuickActionService.class.getName()));
     }
 
     private void createNotificationChannel() {
@@ -162,8 +158,16 @@ public class AppService extends Service {
         public void run() {
             try {
                 TeleportUtil.receiveFile(getBaseContext(), file_server_socket);
-                Log.e("AppService", "thread finish");
             } catch (IOException e) {
+                TeleportUtil.setTransStateFalse("recv");
+                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                Notification.Builder notificationbuilder = new Notification.Builder(getBaseContext(), "8849")
+                        .setContentTitle("文件传送")
+                        .setContentText("传送失败咧~")
+                        .setSmallIcon(R.drawable.ic_launcher_foreground)
+                        .setAutoCancel(true);
+                notificationManager.cancel(515);
+                notificationManager.notify(515, notificationbuilder.build());
                 e.printStackTrace();
             }
         }
