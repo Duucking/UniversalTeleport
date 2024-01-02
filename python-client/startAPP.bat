@@ -1,2 +1,1 @@
-.\.venv\Scripts\pythonw.exe init.py
-exit
+pythonw.exe init.py

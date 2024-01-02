@@ -1,1 +1,1 @@
-.\.venv\Scripts\python.exe sendfile.py %1
+python.exe sendfile.py %1
