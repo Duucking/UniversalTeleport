@@ -1,12 +1,9 @@
 package com.duucking.universalteleport.service;
 
 import android.app.ActivityManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.graphics.drawable.Icon;
-import android.os.IBinder;
 import android.service.quicksettings.Tile;
 import android.service.quicksettings.TileService;
 import android.util.Log;
@@ -20,6 +17,8 @@ import com.duucking.universalteleport.noActivity;
 import java.util.List;
 
 public class QuickActionService extends TileService {
+    private boolean isAppalive = false;
+
     public QuickActionService() {
     }
 
@@ -41,6 +40,12 @@ public class QuickActionService extends TileService {
         Log.e("UniversalTeleportTest", "tile service Listening");
         changeTileState();
 
+    }
+
+    @Override
+    public void onStopListening() {
+        super.onStopListening();
+        Log.e("UniversalTeleportTest", "tile service stop Listening");
     }
 
     @Override
@@ -80,8 +85,10 @@ public class QuickActionService extends TileService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-//        changeTileState();
         Log.e("UniversalTeleportTest", "tile service destroy");
+        if (!isAppalive) {
+            System.exit(0);
+        }
     }
 
     private void changeTileState() {
@@ -90,14 +97,15 @@ public class QuickActionService extends TileService {
         List<ActivityManager.RunningServiceInfo> runningServices = manager.getRunningServices(Integer.MAX_VALUE);
         for (ActivityManager.RunningServiceInfo service : runningServices) {
             if ("com.duucking.universalteleport.service.AppService".equals(service.service.getClassName())) {
-                // MyService 已经启动
                 Log.e("UniversalTeleportTest", "AppService is running");
+                isAppalive = true;
                 tile.setState(Tile.STATE_ACTIVE);
                 tile.setIcon(Icon.createWithResource(this, R.drawable.ic_public_email_send));
                 tile.updateTile();
                 break;
             } else {
                 Log.e("UniversalTeleportTest", "AppService is not running");
+                isAppalive = false;
                 tile.setState(Tile.STATE_INACTIVE);
                 tile.setIcon(Icon.createWithResource(this, R.drawable.ic_public_email_send_filled));
                 tile.updateTile();

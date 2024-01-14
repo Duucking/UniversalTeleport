@@ -1,15 +1,28 @@
 <resources>
     <string name="app_name">UniversalTeleport</string>
-    <string name="notification_channel_id">UniversalTeleport</string>
-    <string name="notification_channel_desc">This notification is used to keep program alive.</string>
+    <string name="notification_main_channel_name">UniversalTeleport</string>
+    <string name="notification_main_channel_desc">This notification is used to keep program alive.</string>
     <string name="notification_title_name">UniversalTeleport is running~</string>
     <string name="notification_title_content1">Notification content</string>
-    <string name="share_activity_label">Send to</string>
+    <string name="share_activity_label">Send file</string>
     <string name="main_activity_key_lable">Key:</string>
     <string name="main_activity_key_plain_text">Input your key</string>
     <string name="share_activity_search_device_notice">Searching devices</string>
     <string name="share_text_activity_label">Share text</string>
     <string name="main_activity_ip_plain_text">Input you computer IP</string>
     <string name="main_activity_save_button">Save</string>
-    <string name="main_activity_illustrate_text">1.Set a IP address(the device you want to connect)\n2.Give notification permission to this app\n3.Give save items to clipboard permission (choose \"Always allow\" ) to this app\n4.Enjoy it!</string>
+    <string name="main_activity_illustrate_text">1.Set a key (Important!!!) \n2.Set a IP address(the device you want to connect)\n3.Set notification permission to this app\n 4.Set save items to clipboard permission (choose \"Always allow\" ) to this app\n 5.Enjoy it!</string>
+    <string name="main_activity_device_name_lable">Name:</string>
+    <string name="main_activity_device_name_plain_text">Input your device name</string>
+    <string name="main_activity_title_lable">Apllication Settings</string>
+    <string name="main_activity_toast_text">Setup successful !</string>
+    <string name="notification_file_share_title">Send file</string>
+    <string name="notification_file_share_type_send">sent</string>
+    <string name="notification_file_share_result_success_send">Send successful !</string>
+    <string name="notification_file_share_type_recv">received</string>
+    <string name="notification_file_share_result_success_recv">Received successfully !\nSaved to /Download/UniversalTeleport</string>
+    <string name="notification_file_share_result_fail_recv">Received failed !</string>
+    <string name="notification_file_channel_name">File share notification</string>
+    <string name="notification_file_channel_desc">This notification is sent when the file is transferred.</string>
+    <string name="notification_file_share_result_fail_send">Send failed !</string>
 </resources>

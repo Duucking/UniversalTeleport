@@ -9,7 +9,6 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.READ_CLIPBOARD" />
-    <uses-permission android:name="android.permission.android.permission.READ_CLIPBOARD_IN_BACKGROUND" />
 
     <application
         android:allowBackup="true"
@@ -43,6 +42,7 @@
             android:enabled="true"
             android:exported="true"
             android:icon="@drawable/ic_public_email_send_filled"
+            android:stopWithTask="true"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
@@ -55,6 +55,7 @@
 
         <activity
             android:name=".ShareActivity"
+            android:excludeFromRecents="true"
             android:exported="true"
             android:label="@string/share_activity_label"
             android:theme="@style/transparent_activity">
