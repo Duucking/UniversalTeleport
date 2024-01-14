@@ -1,5 +1,5 @@
 # UniversalTeleport
-Language:**English** | [简体中文](https://github.com/Duucking/UniversalTeleport/blob/main/README_zh.md)
+Language: **English** | [简体中文](https://github.com/Duucking/UniversalTeleport/blob/main/README_zh.md)
 
 ***Provide a "teleport" for multi-device***
 
