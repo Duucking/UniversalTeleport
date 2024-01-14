@@ -5,13 +5,12 @@ import time
 from util import configutil
 
 
-def send_tcp_message(send_data):
-    ip_addr = configutil.read_config("Option", "ipAddress")
+def send_tcp_message(address, port, send_data):
     tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_addr = (ip_addr, 8556)
+    server_addr = (address, port)
     tcp_socket.connect(server_addr)
     tcp_socket.send(send_data.encode("UTF-8"))
-    print("server: " + ip_addr + " send_data: " + send_data)
+    print("server: " + address + " send_data: " + send_data)
     tcp_socket.close()
 
 
@@ -21,7 +20,7 @@ def listen_tcp_message():
     tcp_server_socket.bind(address)
     tcp_server_socket.listen(128)
     client_socket, client_addr = tcp_server_socket.accept()
-    recv_data = client_socket.recv(1024)  # 接收1024个字节
+    recv_data = client_socket.recv(1024)
     print(
         "client_ip: " + str(client_addr[0]) + " client_port: " + str(
             client_addr[1]) + " recv_data: " + recv_data.decode("UTF-8"))
@@ -32,8 +31,8 @@ def listen_tcp_message():
     return recv_data.decode("UTF-8")
 
 
-def send_udp_broadcast(message):
-    address = ('255.255.255.255', 8557)
+def send_udp_broadcast(message, port=8557):
+    address = ('192.168.100.255', port)
     udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
     udp_socket.sendto(message.encode("UTF-8"), address)
@@ -41,8 +40,8 @@ def send_udp_broadcast(message):
     udp_socket.close()
 
 
-def listen_udp_message():
-    address = ('', 8557)
+def listen_udp_message(port=8557):
+    address = ('', port)
     udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
     udp_socket.bind(address)
@@ -51,12 +50,14 @@ def listen_udp_message():
         "client_ip: " + str(client_addr[0]) + " client_port: " + str(
             client_addr[1]) + " recv_data: " + recv_data.decode("UTF-8"))
     udp_socket.close()
-    return recv_data.decode("UTF-8")
+    if client_addr[0] == socket.gethostbyname(socket.gethostname()):
+        return client_addr[0], ""
+    return client_addr[0], recv_data.decode("UTF-8")
 
 
 def send_file(filepath):
     ip_addr = configutil.read_config("Option", "ipAddress");
-    send_tcp_message("funtion:fileTrans")
+    send_tcp_message(ip_addr, 8556, "funtion:fileTrans")
     filepath = filepath
     filesize = str(os.path.getsize(filepath))
     fname1, fname2 = os.path.split(filepath)
@@ -106,7 +107,7 @@ def recv_file():
         pass
     else:
         os.makedirs(download_path)
-    f = open(download_path+filename, 'wb')
+    f = open(download_path + filename, 'wb')
     print("start receive")
     while received_size < file_total_size:
         data = client_socket.recv(1024)
@@ -117,3 +118,10 @@ def recv_file():
     client_socket.send('finish\n'.encode("UTF-8"))
     print("out while")
     client_socket.close()
+
+
+def parse_interface_info(interface):
+    ip = interface[4][0]
+    netmask = interface[4][1]
+    broadcast = interface[4][2]
+    return ip, netmask, broadcast

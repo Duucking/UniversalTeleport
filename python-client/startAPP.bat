@@ -1,1 +1,1 @@
-pythonw.exe init.py
+pythonw.exe UniversalTeleport.pyw
