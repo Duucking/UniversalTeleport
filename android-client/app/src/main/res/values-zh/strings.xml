@@ -26,4 +26,5 @@
     <string name="notification_file_channel_name">文件传输通知</string>
     <string name="notification_file_channel_desc">文件传输时会发出此通知</string>
     <string name="notification_file_share_result_fail_send">发送失败咧~</string>
+    <string name="share_activity_start_share_toast_text">开始传送 ...</string>
 </resources>

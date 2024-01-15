@@ -47,6 +47,7 @@ public class ShareActivity extends AppCompatActivity implements View.OnClickList
     private Uri uri;
     private LinearLayout loadingLayout;
     private LinearLayout deviceListLayout;
+    private boolean isSendDeviceDiscover;
 
 
     private final Handler shareHandler = new Handler(Looper.getMainLooper()) {
@@ -55,7 +56,7 @@ public class ShareActivity extends AppCompatActivity implements View.OnClickList
             super.handleMessage(msg);
             switch (msg.what) {
                 case 1:
-                    Log.e("UniversalTeleportTest", "handle处理设备消息:" + msg.obj);
+                    Log.e("UniversalTeleportTest", "handle处理设备消息");
                     JSONObject deviceObject = JSONObject.parseObject(msg.obj.toString());
                     String IP = deviceObject.getString("IP");
                     String deviceName = deviceObject.getString("deviceName");
@@ -71,7 +72,6 @@ public class ShareActivity extends AppCompatActivity implements View.OnClickList
                             StringBuilder stringBuilder = new StringBuilder();
                             for (byte b : encryptKey) {
                                 stringBuilder.append(String.format("%02x", b));
-//                                stringBuilder.append(Integer.toHexString(0xff & b));
                             }
                             myKey = stringBuilder.toString();
                         } catch (NoSuchAlgorithmException e) {
@@ -82,12 +82,14 @@ public class ShareActivity extends AppCompatActivity implements View.OnClickList
                         deviceList.add(device);
                         refreshDeviceList();
                     }
-                    Log.e("UniversalTeleportTest", "获取到设备信息:" + device.getIP() + device.getDeviceName() + device.getKey() + device.getDeviceType());
                     break;
                 case 2:
-                    Log.e("UniversalTeleportTest", "handle处理设备消息2:" + msg.obj);
+                    Log.e("UniversalTeleportTest", "handle处理设备消息2");
                     finish();
                     break;
+                case 3:
+                    deviceListLayout.setVisibility(View.GONE);
+                    loadingLayout.setVisibility(View.VISIBLE);
             }
         }
     };
@@ -99,7 +101,7 @@ public class ShareActivity extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_share);
         loadingLayout = findViewById(R.id.loadingLayout);
         deviceListLayout = findViewById(R.id.deviceListLayout);
-
+        isSendDeviceDiscover = true;
         try {
             discover_server_socket = new ServerSocket(8559, 5);
         } catch (IOException e) {
@@ -107,6 +109,8 @@ public class ShareActivity extends AppCompatActivity implements View.OnClickList
         }
         Thread deviceDiscoverThread = new Thread(new deviceDiscover(shareHandler, discover_server_socket));
         deviceDiscoverThread.start();
+        Thread sendDeviceDiscoverThread = new Thread(new sendDeviceDiscoverMsg());
+        sendDeviceDiscoverThread.start();
 
         findViewById(R.id.area1).setOnClickListener(this);
         findViewById(R.id.area2).setOnClickListener(this);
@@ -140,12 +144,12 @@ public class ShareActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onResume() {
         super.onResume();
-
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        isSendDeviceDiscover = false;
         try {
             discover_server_socket.close();
         } catch (IOException e) {
@@ -178,7 +182,7 @@ public class ShareActivity extends AppCompatActivity implements View.OnClickList
         TextView deviceIP = findViewById((v.getId() + 3));
         sendFileThread = new Thread(new sendFileThread(shareHandler, deviceIP.getText().toString()));
         sendFileThread.start();
-        Toast.makeText(this, "开始传送...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.share_activity_start_share_toast_text), Toast.LENGTH_SHORT).show();
         moveTaskToBack(true);
     }
 
@@ -293,7 +297,6 @@ public class ShareActivity extends AppCompatActivity implements View.OnClickList
         @Override
         public void run() {
             try {
-                TeleportUtil.sendUDPMessage(8557, "funtion:deviceDiscover");
                 TeleportUtil.listenTCPMessage(handler, serverSocket);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -303,6 +306,27 @@ public class ShareActivity extends AppCompatActivity implements View.OnClickList
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            }
+
+        }
+    }
+
+    public class sendDeviceDiscoverMsg implements Runnable {
+
+        @Override
+        public void run() {
+            try {
+                while (isSendDeviceDiscover) {
+                    TeleportUtil.sendUDPMessage(8557, "funtion:deviceDiscover");
+                    Thread.sleep(5000);
+                    deviceList.clear();
+                    Message msg = Message.obtain();
+                    msg.what = 3;
+                    shareHandler.sendMessage(msg);
+                    Thread.sleep(1000);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
         }

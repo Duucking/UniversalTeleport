@@ -126,7 +126,7 @@ public class TeleportUtil {
             Log.e("UniversalTeleportTest", "getMessage:" + message);
         }
         isOnSend = true;
-        Thread notifyProgressThread = new Thread(new notifyTransProgress(context, fileName, "send", socket));
+        Thread notifyProgressThread = new Thread(new notifyTransProgress(context, fileName, "send"));
         notifyProgressThread.start();
         Message msg = Message.obtain();
         msg.what = 2;
@@ -160,11 +160,19 @@ public class TeleportUtil {
         String fileName = reader.readLine();
         os.write("received\n".getBytes());
         String downloadPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/UniversalTeleport";
-        File file = new File(downloadPath);
-        if (!file.exists()) {
-            if (!file.mkdir()) {
+        File downloadPathFile = new File(downloadPath);
+        if (!downloadPathFile.exists()) {
+            if (!downloadPathFile.mkdir()) {
                 throw new IOException("create dir failed");
             }
+        }
+        File downloadFile = new File(downloadPath + "/" + fileName);
+        if (downloadFile.exists()) {
+            int nameEnd = fileName.lastIndexOf('.');
+            StringBuilder stringBuilder = new StringBuilder(fileName);
+            stringBuilder.insert(nameEnd, System.currentTimeMillis());
+            fileName = stringBuilder.toString();
+            downloadFile = new File(downloadPath + "/" + fileName);
         }
         Log.e("UniversalTeleportTest", "downloadPath: " + downloadPath + "/" + fileName);
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(downloadPath + "/" + fileName));
@@ -173,7 +181,7 @@ public class TeleportUtil {
         float progress;
         byte[] tempbytes = new byte[20480];
         isOnRecv = true;
-        Thread notifyProgressThread = new Thread(new notifyTransProgress(context, fileName, "recv", socket));
+        Thread notifyProgressThread = new Thread(new notifyTransProgress(context, fileName, "recv"));
         notifyProgressThread.start();
         while ((byteread = bis.read(tempbytes)) != -1) {
             bytetrans += byteread;
@@ -189,17 +197,15 @@ public class TeleportUtil {
         bos.flush();
         bos.close();
         if (bytetrans < fileSize) {
-            file = new File(downloadPath + "/" + fileName);
-            if (!file.delete()) {
-                throw new IOException("delete file failed");
+            if (!downloadFile.delete()) {
+                Log.e("UniversalTeleportTest", "delete file failed: " + downloadPath + "/" + fileName);
             }
         } else if (fileName.endsWith(".jpg") || fileName.endsWith(".png") || fileName.endsWith(".jpeg")
                 || fileName.endsWith(".gif") || fileName.endsWith(".mp4") || fileName.endsWith(".mkv")
                 || fileName.endsWith(".mov") || fileName.endsWith(".wmv")) {
-            file = new File(downloadPath + "/" + fileName);
-            MediaStore.Images.Media.insertImage(context.getContentResolver(), BitmapFactory.decodeFile(file.getAbsolutePath()), file.getName(), null);
+            MediaStore.Images.Media.insertImage(context.getContentResolver(), BitmapFactory.decodeFile(downloadFile.getAbsolutePath()), downloadFile.getName(), null);
             Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-            Uri uri = Uri.fromFile(file);
+            Uri uri = Uri.fromFile(downloadFile);
             intent.setData(uri);
             context.sendBroadcast(intent);
         }
@@ -215,6 +221,7 @@ public class TeleportUtil {
         byte[] data = msg.getBytes();
         String broadcastAddress = getBroadcast();
         if (broadcastAddress != null) {
+            Log.e("UniversalTeleportTest", "sendData: " + msg);
             datagramPacket = new DatagramPacket(data, 0, data.length, new InetSocketAddress(broadcastAddress, port));
             datagramSocket.send(datagramPacket);
         }
@@ -223,15 +230,17 @@ public class TeleportUtil {
 
     @SuppressWarnings("InfiniteLoopStatement")
     public static void listenUDPMessage(Handler handler, DatagramSocket datagramSocket) throws IOException {
-        byte[] data = new byte[1024];
+        byte[] data = new byte[10240];
         DatagramPacket datagramPacket = new DatagramPacket(data, 0, data.length);
         while (true) {
+            Log.e("UniversalTeleportTest", "start listen");
             datagramSocket.receive(datagramPacket);
             data = datagramPacket.getData();
             int dataLength = datagramPacket.getLength();
             String ip = datagramPacket.getAddress().toString();
             if (!ip.equals(getIpAddress())) {
                 String message = new String(data, 0, dataLength);
+                Log.e("UniversalTeleportTest", "dataLength: " + dataLength);
                 Message msg = Message.obtain();
                 if (message.equals("funtion:deviceDiscover")) {
                     msg.what = 2;
@@ -242,6 +251,7 @@ public class TeleportUtil {
                 }
                 handler.sendMessage(msg);
             }
+            datagramSocket.disconnect();
         }
     }
 
@@ -249,13 +259,11 @@ public class TeleportUtil {
         private final Context context;
         private final String fileName;
         private final String transType;
-        private final Socket socket;
 
-        public notifyTransProgress(Context context, String fileName, String transType, Socket socket) {
+        public notifyTransProgress(Context context, String fileName, String transType) {
             this.context = context;
             this.fileName = fileName;
             this.transType = transType;
-            this.socket = socket;
         }
 
         @Override
@@ -267,7 +275,7 @@ public class TeleportUtil {
                     .setProgress(100, 0, false)
                     .setAutoCancel(true);
             if (transType.equals("send")) {
-                while (isOnSend && !socket.isClosed()) {
+                while (isOnSend) {
                     notificationbuilder.setContentText(fileName + context.getString(R.string.notification_file_share_type_send) + sendProgress + "%");
                     notificationbuilder.setProgress(100, sendProgress, false);
                     notificationManager.notify(514, notificationbuilder.build());
@@ -284,7 +292,7 @@ public class TeleportUtil {
                 }
             }
             if (transType.equals("recv")) {
-                while (isOnRecv && !socket.isClosed()) {
+                while (isOnRecv) {
                     notificationbuilder.setContentText(fileName + context.getString(R.string.notification_file_share_type_recv) + recvProgress + "%");
                     notificationbuilder.setProgress(100, recvProgress, false);
                     notificationManager.notify(515, notificationbuilder.build());

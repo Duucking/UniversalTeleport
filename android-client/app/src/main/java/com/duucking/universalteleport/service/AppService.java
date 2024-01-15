@@ -96,7 +96,7 @@ public class AppService extends Service {
                             byte[] encryptKey = object.digest(key.getBytes(StandardCharsets.UTF_8));
                             StringBuilder stringBuilder = new StringBuilder();
                             for (byte b : encryptKey) {
-                                stringBuilder.append(Integer.toHexString(0xff & b));
+                                stringBuilder.append(String.format("%02x", b));
                             }
                             key = stringBuilder.toString();
                         } catch (NoSuchAlgorithmException e) {

@@ -25,4 +25,5 @@
     <string name="notification_file_channel_name">File share notification</string>
     <string name="notification_file_channel_desc">This notification is sent when the file is transferred.</string>
     <string name="notification_file_share_result_fail_send">Send failed !</string>
+    <string name="share_activity_start_share_toast_text">Start send ...</string>
 </resources>
