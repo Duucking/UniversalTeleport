@@ -7,7 +7,7 @@ Language: **English** | [简体中文](https://github.com/Duucking/UniversalTele
 1. Device discovery
 2. Share copy to other device
 3. Send file to other device
-4. Data Encrypt
+4. Data Encrypt (AES+BASE64)
 ## Preset:
 1. Install python.[Download Url](https://www.python.org/downloads/)
 2. Install dependencies, just run the "installRequirements.bat" file.
@@ -21,7 +21,7 @@ Language: **English** | [简体中文](https://github.com/Duucking/UniversalTele
 
 ### Set the key and device's name.
 
-*Python client need set a target ip address to send file*
+*Python client need set a target ip address in "config.ini"  to send file*
 
 |Android client|Python client|
 |:----:|:----:|
