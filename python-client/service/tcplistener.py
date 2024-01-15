@@ -1,6 +1,9 @@
+import os
+
 from util import configutil
 from util.clipboardutil import setClipboard
 from util.datautil import AES_CBC_decrypt
+from util.sendnotification import send_notification
 from util.socketutil import listen_tcp_message
 
 
@@ -12,5 +15,9 @@ def tcp_listener():
             pass
         elif data != "":
             key = configutil.read_config("Option", "privateKey")
-            data = AES_CBC_decrypt(data, key)
-            setClipboard(data)
+            if key != "":
+                data = AES_CBC_decrypt(data, key)
+                setClipboard(data)
+                title = '已复制到剪切板'
+                message = data[0:16] + '...'
+                send_notification(title, message)

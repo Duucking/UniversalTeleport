@@ -3,6 +3,7 @@ import socket
 import time
 
 from util import configutil
+from util.sendnotification import send_notification
 
 
 def send_tcp_message(address, port, send_data):
@@ -32,7 +33,11 @@ def listen_tcp_message():
 
 
 def send_udp_broadcast(message, port=8557):
-    address = ('192.168.100.255', port)
+    ip_address = socket.gethostbyname(socket.gethostname())
+    ip_address = ip_address.split('.')
+    ip_address[3] = '255'
+    broadcast_address = ip_address[0] + '.' + ip_address[1] + '.' + ip_address[2] + '.' + ip_address[3]
+    address = (broadcast_address, port)
     udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
     udp_socket.sendto(message.encode("UTF-8"), address)
@@ -45,7 +50,7 @@ def listen_udp_message(port=8557):
     udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
     udp_socket.bind(address)
-    recv_data, client_addr = udp_socket.recvfrom(1024)
+    recv_data, client_addr = udp_socket.recvfrom(10240)
     print(
         "client_ip: " + str(client_addr[0]) + " client_port: " + str(
             client_addr[1]) + " recv_data: " + recv_data.decode("UTF-8"))
@@ -107,21 +112,19 @@ def recv_file():
         pass
     else:
         os.makedirs(download_path)
+    if os.path.exists(download_path + filename):
+        end_index = filename.rfind('.')
+        filename_list = list(filename)
+        filename_list.insert(end_index, str(int(time.time())))
+        filename = ''.join(filename_list)
     f = open(download_path + filename, 'wb')
     print("start receive")
     while received_size < file_total_size:
         data = client_socket.recv(1024)
         f.write(data)
         received_size += len(data)
-        print('已接收 ', received_size, ' Byte')
     f.close()
     client_socket.send('finish\n'.encode("UTF-8"))
+    send_notification("文件保存成功", download_path + filename)
     print("out while")
     client_socket.close()
-
-
-def parse_interface_info(interface):
-    ip = interface[4][0]
-    netmask = interface[4][1]
-    broadcast = interface[4][2]
-    return ip, netmask, broadcast
