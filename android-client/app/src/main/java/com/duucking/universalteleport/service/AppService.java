@@ -50,15 +50,16 @@ public class AppService extends Service {
             switch (msg.what) {
                 case 1:
                     try {
-                        if (msg.obj.equals("funtion:fileTrans")) {
+                        String[] msgContent = (String[]) msg.obj;
+                        if (msgContent[0].equals("funtion:fileTrans")) {
                             Thread getFilethread = new Thread(new getFileThread());
                             getFilethread.start();
                         } else {
                             SharedPreferences sharedPreferences = getSharedPreferences("config", MODE_PRIVATE);
                             String key = sharedPreferences.getString("key", "");
-                            String data = DataUtil.Decrypt(String.valueOf(msg.obj), key);
+                            String data = DataUtil.Decrypt(String.valueOf(msgContent[0]), key);
                             if (data == null) {
-                                data = String.valueOf(msg.obj);
+                                data = msgContent[0];
                             }
                             ClipboardUtil.setClipboard(getBaseContext(), data);
                         }

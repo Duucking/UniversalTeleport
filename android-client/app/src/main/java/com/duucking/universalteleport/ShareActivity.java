@@ -56,13 +56,14 @@ public class ShareActivity extends AppCompatActivity implements View.OnClickList
             super.handleMessage(msg);
             switch (msg.what) {
                 case 1:
+                    String[] msgContent = (String[]) msg.obj;
                     Log.e("UniversalTeleportTest", "handle处理设备消息");
-                    JSONObject deviceObject = JSONObject.parseObject(msg.obj.toString());
-                    String IP = deviceObject.getString("IP");
+                    JSONObject deviceObject = JSONObject.parseObject(msgContent[0]);
+//                    String IP = deviceObject.getString("IP");
                     String deviceName = deviceObject.getString("deviceName");
                     String Key = deviceObject.getString("Key");
                     String deviceType = deviceObject.getString("deviceType");
-                    Device device = new Device(IP, deviceName, Key, deviceType);
+                    Device device = new Device(msgContent[1], deviceName, Key, deviceType);
                     SharedPreferences sharedPreferences = getSharedPreferences("config", MODE_PRIVATE);
                     String myKey = sharedPreferences.getString("key", "");
                     if (!myKey.equals("")) {
@@ -90,6 +91,7 @@ public class ShareActivity extends AppCompatActivity implements View.OnClickList
                 case 3:
                     deviceListLayout.setVisibility(View.GONE);
                     loadingLayout.setVisibility(View.VISIBLE);
+                    break;
             }
         }
     };
@@ -111,13 +113,6 @@ public class ShareActivity extends AppCompatActivity implements View.OnClickList
         deviceDiscoverThread.start();
         Thread sendDeviceDiscoverThread = new Thread(new sendDeviceDiscoverMsg());
         sendDeviceDiscoverThread.start();
-
-        findViewById(R.id.area1).setOnClickListener(this);
-        findViewById(R.id.area2).setOnClickListener(this);
-        findViewById(R.id.area3).setOnClickListener(this);
-        findViewById(R.id.area4).setOnClickListener(this);
-        findViewById(R.id.area5).setOnClickListener(this);
-        findViewById(R.id.area6).setOnClickListener(this);
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         String action = intent.getAction();
@@ -136,7 +131,6 @@ public class ShareActivity extends AppCompatActivity implements View.OnClickList
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
             }
         }
     }
@@ -161,24 +155,6 @@ public class ShareActivity extends AppCompatActivity implements View.OnClickList
     @SuppressLint("ResourceType")
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.area1 || v.getId() == R.id.area3 || v.getId() == R.id.area4) {
-            Toast.makeText(this, "发送成功！", Toast.LENGTH_SHORT).show();
-            finish();
-        }
-
-        if (v.getId() == R.id.area2) {
-            Toast.makeText(this, "发送失败！", Toast.LENGTH_SHORT).show();
-            finish();
-        }
-
-        if (v.getId() == R.id.area5) {
-            Toast.makeText(this, "500 Internal Error！", Toast.LENGTH_SHORT).show();
-            finish();
-        }
-        if (v.getId() == R.id.area6) {
-            Toast.makeText(this, "ᕕ(◠ڼ◠)ᕗ", Toast.LENGTH_SHORT).show();
-            finish();
-        }
         TextView deviceIP = findViewById((v.getId() + 3));
         sendFileThread = new Thread(new sendFileThread(shareHandler, deviceIP.getText().toString()));
         sendFileThread.start();
@@ -239,7 +215,6 @@ public class ShareActivity extends AppCompatActivity implements View.OnClickList
                 int[] attribute = new int[]{android.R.attr.selectableItemBackground};
                 TypedArray typedArray = getTheme().obtainStyledAttributes(typedValue.resourceId, attribute);
                 deviceLayout.setBackground(typedArray.getDrawable(0));
-
                 deviceListLayout.addView(deviceLayout, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
                 deviceListLayout.setVisibility(View.VISIBLE);
             }
@@ -280,6 +255,12 @@ public class ShareActivity extends AppCompatActivity implements View.OnClickList
                 notificationManager.cancel(514);
                 notificationManager.notify(514, notificationbuilder.build());
                 e.printStackTrace();
+            } finally {
+                try {
+                    discover_server_socket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -328,7 +309,6 @@ public class ShareActivity extends AppCompatActivity implements View.OnClickList
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         }
     }
 }

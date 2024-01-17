@@ -87,7 +87,7 @@ public class TeleportUtil {
             Log.e("UniversalTeleportTest", "Connection closed");
             Message msg = Message.obtain();
             msg.what = 1;
-            msg.obj = message;
+            msg.obj = new String[]{message, ipAddr};
             handler.sendMessage(msg);
         }
     }
@@ -96,13 +96,16 @@ public class TeleportUtil {
     @SuppressLint("Range")
     public static void sendFile(Handler handler, Context context, String address, int port, Uri uri) throws IOException {
         InputStream input = context.getContentResolver().openInputStream(uri);
-        assert input != null;
-        long fileSize = input.available();
+        long fileSize = 0;
         String fileName = "";
         ContentResolver resolver = context.getContentResolver();
         Cursor cursor = resolver.query(uri, null, null, null, null);
         if (cursor != null && cursor.moveToFirst()) {
             fileName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+            int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
+            if (!cursor.isNull(sizeIndex)) {
+                fileSize = cursor.getLong(sizeIndex);
+            }
             cursor.close();
         }
         Log.e("UniversalTeleportTest", "filesize: " + fileSize);
@@ -210,7 +213,6 @@ public class TeleportUtil {
             context.sendBroadcast(intent);
         }
         os.write("finish\n".getBytes());
-        // 释放资源
         socket.shutdownInput();
         socket.shutdownOutput();
     }
@@ -247,7 +249,7 @@ public class TeleportUtil {
                     msg.obj = ip;
                 } else {
                     msg.what = 1;
-                    msg.obj = message;
+                    msg.obj = new String[]{message, ip};
                 }
                 handler.sendMessage(msg);
             }
@@ -289,6 +291,7 @@ public class TeleportUtil {
                     notificationbuilder.setProgress(0, 0, false);
                     notificationbuilder.setContentText(fileName + context.getString(R.string.notification_file_share_result_success_send));
                     notificationManager.notify(514, notificationbuilder.build());
+                    sendProgress = 0;
                 }
             }
             if (transType.equals("recv")) {
@@ -306,10 +309,12 @@ public class TeleportUtil {
                     notificationbuilder.setProgress(0, 0, false);
                     notificationbuilder.setContentText(fileName + context.getString(R.string.notification_file_share_result_success_recv));
                     notificationManager.notify(515, notificationbuilder.build());
+                    recvProgress = 0;
                 } else {
                     notificationbuilder.setProgress(0, 0, false);
                     notificationbuilder.setContentText(fileName + context.getString(R.string.notification_file_share_result_fail_recv));
                     notificationManager.notify(515, notificationbuilder.build());
+                    recvProgress = 0;
                 }
             }
 
